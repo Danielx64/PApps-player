@@ -73,6 +73,10 @@ namespace PAppsplayer
 		}
 		public MainWindow()
 		{
+			if (!Directory.Exists(PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER))
+			{
+				Directory.CreateDirectory(PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER);
+			}
 			InitializeComponent();
 			AttachControlEventHandlers();
 		}
