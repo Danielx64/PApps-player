@@ -87,11 +87,11 @@ namespace PAppsplayer
 		}
 
 
-		private void AddTab(string url, string headerText = null, string userDataFolder = null)
+		private void AddTab(string url, string headerText = null)
 		{
-			AddTab(new Uri(url), headerText, userDataFolder);
+			AddTab(new Uri(url), headerText);
 		}
-		private void AddTab(Uri uri, string headerText = null, string userDataFolder = null)
+		private void AddTab(Uri uri, string headerText = null)
 		{
 			//increment
 			_tabCount++;
@@ -105,11 +105,12 @@ namespace PAppsplayer
 			};
 			//if userDataFolder hasn't been specified, create a folder in the user's temp folder
 			//each WebView2 instance will have it's own folder
-			if (String.IsNullOrEmpty(userDataFolder))
-				userDataFolder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetExecutingAssembly().Location) + _tabCount);
-
+			if (!Directory.Exists(Globals.USER_DATA_FOLDER))
+			{
+				Directory.CreateDirectory(Globals.USER_DATA_FOLDER);
+			}
 			//create new instance setting userDataFolder
-			WebView2 wv = new WebView2() { CreationProperties = new CoreWebView2CreationProperties() { UserDataFolder = userDataFolder } };
+			WebView2 wv = new WebView2() { CreationProperties = new CoreWebView2CreationProperties() { UserDataFolder = Globals.USER_DATA_FOLDER } };
 			wv.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
 
 			//create TextBlock
