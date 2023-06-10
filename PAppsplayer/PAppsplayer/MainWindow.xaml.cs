@@ -18,6 +18,21 @@ namespace PAppsplayer
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+
+		public static class Globals
+		{
+			public static readonly String APP_ID = "your app id"; // Unmodifiable
+			public static readonly String APP_ICON = "/Images/globe.png"; // Unmodifiable
+			public static readonly String APP_FOLDER_NAME = "your app folder name"; // Unmodifiable
+			public static readonly String APP_NAME = "your app name"; // Unmodifiable
+			public static readonly String TENANT_ID = "your teant id"; // Unmodifiable
+			public static readonly String APP_USERAGENT = "Your useragent here";
+			public static readonly String URI_SCHEMA = "ms-mobile-apps:///providers/Microsoft.PowerApps/apps/";
+			public static readonly String BASE_URL = "https://apps.powerapps.com/play/" + APP_ID + "?tenantId=" + TENANT_ID + "&source=iframe&hidenavbar=true"; // Unmodifiable
+			public static readonly String APP_REQUEST_LANG = "en-AU";
+			public static readonly String USER_DATA_FOLDER = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), APP_FOLDER_NAME);
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		private int _tabCount = 0;
