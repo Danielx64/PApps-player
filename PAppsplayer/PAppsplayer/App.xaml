@@ -1,7 +1,7 @@
-﻿<Application x:Class="WebView2TabTestWpfGC.App"
+﻿<Application x:Class="PAppsplayer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WebView2TabTestWpfGC"
+             xmlns:local="clr-namespace:PAppsplayer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

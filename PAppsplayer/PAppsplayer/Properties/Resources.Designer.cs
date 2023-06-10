@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebView2TabTestWpfGC.Properties
+namespace PAppsplayer.Properties
 {
 
 
