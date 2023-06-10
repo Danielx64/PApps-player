@@ -98,7 +98,11 @@ namespace PAppsplayer
 
 			if (headerText == null)
 				headerText = $"Tab {_tabCount}";
-
+			var options = new CoreWebView2EnvironmentOptions
+			{
+				AllowSingleSignOnUsingOSPrimaryAccount = true,
+				Language = $"{Globals.APP_REQUEST_LANG}"
+			};
 			//if userDataFolder hasn't been specified, create a folder in the user's temp folder
 			//each WebView2 instance will have it's own folder
 			if (String.IsNullOrEmpty(userDataFolder))
@@ -219,7 +223,6 @@ namespace PAppsplayer
 
 		private void CoreWebView2_NewWindowRequested(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NewWindowRequestedEventArgs e)
 		{
-
 			if (e.Uri.Contains("apps.powerapps.com/play/e/"))
 			{
 
