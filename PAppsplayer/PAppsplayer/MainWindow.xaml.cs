@@ -219,9 +219,17 @@ namespace PAppsplayer
 
 		private void CoreWebView2_NewWindowRequested(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NewWindowRequestedEventArgs e)
 		{
-			e.Handled = true;
 
-			AddTab(e.Uri);
+			if (e.Uri.Contains("apps.powerapps.com/play/e/"))
+			{
+
+				e.Handled = false;
+			}
+			else
+			{
+				AddTab(e.Uri);
+				e.Handled = true;
+			}
 		}
 
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)
