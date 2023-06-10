@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace PAppsplayer
 {
@@ -73,6 +74,7 @@ namespace PAppsplayer
 		public MainWindow()
 		{
 			InitializeComponent();
+			AttachControlEventHandlers();
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -319,11 +321,8 @@ namespace PAppsplayer
 					}
 				}
 			}
-
-
-
-
 		}
+
 		public static string RemoveSpecialChars(string str)
 		{
 
@@ -340,6 +339,53 @@ namespace PAppsplayer
 				}
 			}
 			return str;
+		}
+
+		public void OnChanged(Object sender, FileSystemEventArgs e)
+		{
+			Dispatcher.Invoke(() =>
+			{
+				this.Activate();
+				var milliseconds = 100;
+				Thread.Sleep(milliseconds);
+				if (e.ChangeType != WatcherChangeTypes.Changed)
+				{
+					return;
+				}
+
+				string filePath = @MainWindow.Globals.USER_DATA_FOLDER + @"\temp.txt";
+				using (StreamReader inputFile = new StreamReader(filePath))
+				{
+					var outString = Regex.Replace(inputFile.ReadToEnd(), @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
+					var outString1 = MainWindow.RemoveSpecialChars(outString);
+					//Add code to check for gpu pram
+					if (outString1.StartsWith("gpu"))
+					{
+						AddTab($"edge://gpu");
+					}
+					else
+					{
+						AddTab($"{Globals.BASE_URL}{outString1}&source=iframe&hidenavbar=true");
+					}
+				}
+			});
+		}
+		public void AttachControlEventHandlers()
+		{
+			if (!Directory.Exists(Globals.USER_DATA_FOLDER))
+			{
+				Directory.CreateDirectory(Globals.USER_DATA_FOLDER);
+			}
+
+			 var watcher = new FileSystemWatcher($"{Globals.USER_DATA_FOLDER}");
+
+			//FileSystemWatcher fileSystemWatcher = new($"{Globals.USER_DATA_FOLDER}");
+			//var watcher = fileSystemWatcher;
+			watcher.NotifyFilter = NotifyFilters.LastWrite;
+			watcher.Changed += OnChanged;
+			watcher.Filter = "temp.txt";
+			watcher.IncludeSubdirectories = false;
+			watcher.EnableRaisingEvents = true;
 		}
 	}
 }
