@@ -10,6 +10,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 namespace PAppsplayer
 {
@@ -265,14 +267,62 @@ namespace PAppsplayer
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			if (_webView2Tabs != null && _webView2Tabs.Count > 0)
+			MessageBoxResult result = MessageBox.Show("Do you really want to close " + Globals.APP_NAME + "?",
+"Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+			if (result == MessageBoxResult.No)
 			{
-				for (int i = 0; i < _webView2Tabs.Count - 1; i++)
+				e.Cancel = true;
+			}
+			if (result == MessageBoxResult.Yes)
+			{
+				if (_webView2Tabs != null && _webView2Tabs.Count > 0)
 				{
-					//remove all tabs which will dispose of each WebView2
-					RemoveTab(i);
+					for (int i = 0; i < _webView2Tabs.Count - 1; i++)
+					{
+						//remove all tabs which will dispose of each WebView2
+						RemoveTab(i);
+					}
+				}
+				var milliseconds = 100;
+				Thread.Sleep(milliseconds);
+				DirectoryInfo directory = new DirectoryInfo(Globals.USER_DATA_FOLDER);
+
+				foreach (FileInfo file in directory.EnumerateFiles())
+				{
+					try
+					{
+						file.Delete();
+					}
+					catch (IOException)
+					{
+						return;
+					}
+					catch (UnauthorizedAccessException)
+					{
+						return;
+					}
+				}
+
+				foreach (DirectoryInfo dir in directory.EnumerateDirectories())
+				{
+					try
+					{
+						dir.Delete(true);
+					}
+					catch (IOException)
+					{
+						return;
+					}
+					catch (UnauthorizedAccessException)
+					{
+						return;
+					}
 				}
 			}
+
+
+
+
 		}
 		public static string RemoveSpecialChars(string str)
 		{
@@ -289,7 +339,6 @@ namespace PAppsplayer
 					str = str.Replace(chars[i], "");
 				}
 			}
-
 			return str;
 		}
 	}
