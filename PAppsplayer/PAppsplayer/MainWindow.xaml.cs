@@ -278,6 +278,15 @@ namespace PAppsplayer
 			if (sender != null)
 			{
 				WebView2 wv = (WebView2)sender;
+				wv.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
+				wv.CoreWebView2.Settings.AreDevToolsEnabled = false;
+				wv.CoreWebView2.Settings.IsStatusBarEnabled = false;
+				wv.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
+				wv.CoreWebView2.Settings.AreHostObjectsAllowed = false;
+				wv.CoreWebView2.Settings.IsWebMessageEnabled = false;
+				wv.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = false;
+				wv.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+				wv.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
 				wv.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
 				wv.CoreWebView2.ContextMenuRequested += menurequested;
 			}
