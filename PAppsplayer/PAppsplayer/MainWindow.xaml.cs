@@ -244,10 +244,11 @@ namespace PAppsplayer
 
 		private void CoreWebView2_NewWindowRequested(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NewWindowRequestedEventArgs e)
 		{
+			//WebView2 wv = (WebView2)_webView2Tabs[SelectedIndex].Content;
 			if (e.Uri.Contains("apps.powerapps.com/play/e/"))
 			{
-				//e.NewWindow = CoreWebView2;
-				e.Handled = false;
+				e.NewWindow = (CoreWebView2)sender;
+				e.Handled = true;
 			}
 			else
 			{
@@ -327,6 +328,7 @@ namespace PAppsplayer
 				{
 					for (int i = 0; i < _webView2Tabs.Count - 1; i++)
 					{
+						MessageBox.Show($"{i}");
 						//remove all tabs which will dispose of each WebView2
 						RemoveTab(i);
 					}
