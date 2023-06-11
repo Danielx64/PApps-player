@@ -3,8 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Microsoft.Web.WebView2.Core;
+
 using Microsoft.Web.WebView2.Wpf;
+using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -128,10 +129,14 @@ namespace PAppsplayer
 			{
 				Directory.CreateDirectory(Globals.USER_DATA_FOLDER);
 			}
-			
+			var webView2Environment = CoreWebView2Environment.CreateAsync(null, Globals.USER_DATA_FOLDER, options).Result;
+
+			//this.wv.webView2Control.EnsureCoreWebView2Async(webView2Environment);
 			var	userDataFolder = System.IO.Path.Combine(Globals.USER_DATA_FOLDER +"\\"+ _tabCount);
 			//create new instance setting userDataFolder
-			WebView2 wv = new WebView2() { CreationProperties = new CoreWebView2CreationProperties() { UserDataFolder = userDataFolder } };
+			WebView2 wv = new WebView2();
+			wv.EnsureCoreWebView2Async(webView2Environment);
+
 			wv.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
 
 			//create TextBlock
