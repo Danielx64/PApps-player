@@ -123,16 +123,17 @@ namespace PAppsplayer
 				AllowSingleSignOnUsingOSPrimaryAccount = true,
 				Language = $"{Globals.APP_REQUEST_LANG}"
 			};
+			var userDataFolder = System.IO.Path.Combine(Globals.USER_DATA_FOLDER + "\\" + _tabCount);
 			//if userDataFolder hasn't been specified, create a folder in the user's temp folder
 			//each WebView2 instance will have it's own folder
 			if (!Directory.Exists(Globals.USER_DATA_FOLDER))
 			{
 				Directory.CreateDirectory(Globals.USER_DATA_FOLDER);
 			}
-			var webView2Environment = CoreWebView2Environment.CreateAsync(null, Globals.USER_DATA_FOLDER, options).Result;
+			var webView2Environment = CoreWebView2Environment.CreateAsync(null, userDataFolder, options).Result;
 
 			//this.wv.webView2Control.EnsureCoreWebView2Async(webView2Environment);
-			var	userDataFolder = System.IO.Path.Combine(Globals.USER_DATA_FOLDER +"\\"+ _tabCount);
+			
 			//create new instance setting userDataFolder
 			WebView2 wv = new WebView2();
 			wv.EnsureCoreWebView2Async(webView2Environment);
@@ -211,12 +212,42 @@ namespace PAppsplayer
 				//wait for WebView2 process to exit
 				wvProcess.WaitForExit();
 
-				if (!String.IsNullOrEmpty(userDataFolder) && System.IO.Directory.Exists(userDataFolder))
+				DirectoryInfo directory = new DirectoryInfo(userDataFolder);
+
+				foreach (FileInfo file in directory.EnumerateFiles())
 				{
-					System.IO.Directory.Delete(userDataFolder, true);
-					LogMsg($"UserDataFolder '{userDataFolder}' deleted.");
+					try
+					{
+						file.Delete();
+					}
+					catch (IOException)
+					{
+						return;
+					}
+					catch (UnauthorizedAccessException)
+					{
+						return;
+					}
 				}
-				//TabItem item = _webView2Tabs[index];
+
+				foreach (DirectoryInfo dir in directory.EnumerateDirectories())
+				{
+					try
+					{
+						dir.Delete(true);
+					}
+					catch (IOException)
+					{
+						return;
+					}
+					catch (UnauthorizedAccessException)
+					{
+						return;
+					}
+				}
+
+
+				TabItem item = _webView2Tabs[index];
 				LogMsg($"Removing {_webView2Tabs[index].Name}");
 
 				//remove
