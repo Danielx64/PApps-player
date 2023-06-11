@@ -182,14 +182,8 @@ namespace PAppsplayer
 				wv.Dispose();
 
 				//wait for WebView2 process to exit
-				wvProcess.WaitForExit();
+				//wvProcess.WaitForExit();
 
-				//for security purposes, delete userDataFolder
-				if (!String.IsNullOrEmpty(userDataFolder) && System.IO.Directory.Exists(userDataFolder))
-				{
-					System.IO.Directory.Delete(userDataFolder, true);
-					LogMsg($"UserDataFolder '{userDataFolder}' deleted.");
-				}
 
 				//TabItem item = _webView2Tabs[index];
 				LogMsg($"Removing {_webView2Tabs[index].Name}");
