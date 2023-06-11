@@ -14,6 +14,7 @@ using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
 
+
 namespace PAppsplayer
 {
 	/// <summary>
@@ -83,7 +84,25 @@ namespace PAppsplayer
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			AddTab("https://www.microsoft.com");
+			if (Environment.GetCommandLineArgs().Length > 1)
+			{
+				var outString = RemoveSpecialChars(Environment.GetCommandLineArgs()[1]);
+				//Add code to check for gpu pram
+				if (outString.StartsWith("gpu"))
+				{
+					AddTab($"edge://gpu");
+					return;
+				}
+				else
+				{
+					AddTab($"{Globals.BASE_URL}{outString}&source=iframe&hidenavbar=true");
+					return;
+				}
+			}
+			else
+			{
+				AddTab($"{Globals.BASE_URL}");
+			}
 		}
 
 
@@ -109,8 +128,10 @@ namespace PAppsplayer
 			{
 				Directory.CreateDirectory(Globals.USER_DATA_FOLDER);
 			}
+			
+			var	userDataFolder = System.IO.Path.Combine(Globals.USER_DATA_FOLDER +"\\"+ _tabCount);
 			//create new instance setting userDataFolder
-			WebView2 wv = new WebView2() { CreationProperties = new CoreWebView2CreationProperties() { UserDataFolder = Globals.USER_DATA_FOLDER } };
+			WebView2 wv = new WebView2() { CreationProperties = new CoreWebView2CreationProperties() { UserDataFolder = userDataFolder } };
 			wv.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
 
 			//create TextBlock
@@ -177,14 +198,19 @@ namespace PAppsplayer
 
 				//get process
 				var wvProcess = Process.GetProcessById((int)wv.CoreWebView2.BrowserProcessId);
-
+				wv.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
+				wv.CoreWebView2.Profile.ClearBrowsingDataAsync();
 				//dispose
 				wv.Dispose();
 
 				//wait for WebView2 process to exit
-				//wvProcess.WaitForExit();
+				wvProcess.WaitForExit();
 
-
+				if (!String.IsNullOrEmpty(userDataFolder) && System.IO.Directory.Exists(userDataFolder))
+				{
+					System.IO.Directory.Delete(userDataFolder, true);
+					LogMsg($"UserDataFolder '{userDataFolder}' deleted.");
+				}
 				//TabItem item = _webView2Tabs[index];
 				LogMsg($"Removing {_webView2Tabs[index].Name}");
 
@@ -212,7 +238,7 @@ namespace PAppsplayer
 			}
 			else
 			{
-				AddTab("https://www.microsoft.com");
+				AddTab($"{Globals.BASE_URL}");
 			}
 		}
 
@@ -220,7 +246,7 @@ namespace PAppsplayer
 		{
 			if (e.Uri.Contains("apps.powerapps.com/play/e/"))
 			{
-
+				//e.NewWindow = CoreWebView2;
 				e.Handled = false;
 			}
 			else
