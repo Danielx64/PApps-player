@@ -286,6 +286,11 @@ namespace PAppsplayer
 				e.NewWindow = (CoreWebView2)sender;
 				e.Handled = true;
 			}
+			else if (e.Uri.Contains("edge://gpu"))
+			{
+				e.NewWindow = (CoreWebView2)sender;
+				e.Handled = true;
+			}
 			else
 			{
 				AddTab(e.Uri);
