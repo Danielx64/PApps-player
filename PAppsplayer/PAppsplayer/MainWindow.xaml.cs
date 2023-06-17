@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
@@ -13,8 +12,63 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using ChromeTabs;
+
+namespace PAppsplayer.ViewModel
+{
+	public abstract class TabBase : ViewModelBase
+	{
+		private int _tabNumber;
+		public int TabNumber
+		{
+			get => _tabNumber;
+			set
+			{
+				if (_tabNumber != value)
+				{
+					Set(() => TabNumber, ref _tabNumber, value);
+				}
+			}
+		}
+
+		private string _tabName;
+		public string TabName
+		{
+			get => _tabName;
+			set
+			{
+				if (_tabName != value)
+				{
+					Set(() => TabName, ref _tabName, value);
+				}
+			}
+		}
 
 
+		private bool _isPinned;
+		public bool IsPinned
+		{
+			get => _isPinned;
+			set
+			{
+				if (_isPinned != value)
+				{
+					Set(() => IsPinned, ref _isPinned, value);
+				}
+			}
+		}
+	}
+}
+
+namespace PAppsplayer.ViewModel
+{
+	public class TabClass1 : TabBase
+	{
+		public string MyStringContent { get; set; }
+	}
+}
 namespace PAppsplayer
 {
 	/// <summary>
@@ -22,6 +76,38 @@ namespace PAppsplayer
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		public ObservableCollection<MainWindow> ItemCollection { get; set; }
+		//since we don't know what kind of objects are bound, so the sorting happens outside with the ReorderTabsCommand.
+		public RelayCommand<TabReorder> ReorderTabsCommand { get; set; }
+		public RelayCommand AddTabCommand { get; set; }
+		public RelayCommand<MainWindow> CloseTabCommand { get; set; }
+
+
+
+		//To close a tab, we simply remove the viewmodel from the source collection.
+		private void CloseTabCommandAction(MainWindow vm)
+		{
+			ItemCollection.Remove(vm);
+		}
+
+		//Adds a random tab
+		private void AddTabCommandAction()
+		{
+			//Code to create new tab and new instance of webview
+			ItemCollection.Add(CreateTab1());
+		}
+		protected MainWindow CreateTab1()
+		{
+
+		//I think I create my webview here?
+
+			var tab = new ViewModel { TabName = "Tab class 1", MyStringContent = "New webview2 content here"};
+			return tab;
+		}
+		private object MainWindow1()
+		{
+			throw new NotImplementedException();
+		}
 
 		public static class Globals
 		{
@@ -74,6 +160,11 @@ namespace PAppsplayer
 		}
 		public MainWindow()
 		{
+			ItemCollection = new ObservableCollection<MainWindow>();
+			//	ItemCollection.CollectionChanged += ItemCollection_CollectionChanged;
+			//	ReorderTabsCommand = new RelayCommand<TabReorder>(ReorderTabsCommandAction);
+			AddTabCommand = new RelayCommand(AddTabCommandAction, () => true);
+			CloseTabCommand = new RelayCommand<MainWindow>(CloseTabCommandAction);
 			if (!Directory.Exists(PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER))
 			{
 				Directory.CreateDirectory(PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER);
@@ -110,6 +201,8 @@ namespace PAppsplayer
 		{
 			AddTab(new Uri(url), headerText);
 		}
+
+		//This function creates a new webview2 instance when a tab is created in any means
 		private void AddTab(Uri uri, string headerText = null)
 		{
 			//increment
@@ -131,8 +224,6 @@ namespace PAppsplayer
 			}
 			var webView2Environment = CoreWebView2Environment.CreateAsync(null, userDataFolder, options).Result;
 
-			//this.wv.webView2Control.EnsureCoreWebView2Async(webView2Environment);
-			
 			//create new instance setting userDataFolder
 			WebView2 wv = new WebView2();
 			wv.EnsureCoreWebView2Async(webView2Environment);
@@ -162,6 +253,7 @@ namespace PAppsplayer
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
+		//This function hold what should be done when the tab is closed off
 		private void RemoveTab(int index)
 		{
 			if (index >= 0 && index < _webView2Tabs.Count)
@@ -233,6 +325,7 @@ namespace PAppsplayer
 			}
 		}
 
+		//This is the function that is run when a new tab button is pressed (although may not even be needed)
 		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (_webView2Tabs.Count > 0)
@@ -272,40 +365,6 @@ namespace PAppsplayer
 			}
 		}
 
-		private void Hyperlink_Click(object sender, RoutedEventArgs e)
-		{
-			Hyperlink hyperlink = (Hyperlink)sender;
-
-			LogMsg($"Hyperlink_Click - name: {hyperlink.Name}");
-
-			string hyperLinkNumStr = hyperlink.Name.Substring(hyperlink.Name.IndexOf("_") + 1);
-			int hyperLinkNum = 0;
-
-			//try to convert to int
-			Int32.TryParse(hyperLinkNumStr, out hyperLinkNum);
-
-			int index = 0;
-
-			//it's possible that an 'X' was clicked on a tab that wasn't selected
-			//since both the tab name and hyperlink name end with the same number,
-			//get the number from the hyperlink name and use that to find the matching 
-			//tab name
-			for (int i = 0; i < _webView2Tabs.Count; i++)
-			{
-				TabItem item = _webView2Tabs[i];
-
-				if (item.Name == $"tab_{hyperLinkNum}")
-				{
-					index = i;
-					break;
-				}
-			}
-
-			//set selected index
-			tabControl1.SelectedIndex = index;
-
-			RemoveTab(index);
-		}
 		private void WebView2_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
 		{
 			LogMsg("WebView2_CoreWebView2InitializationCompleted");
@@ -329,6 +388,7 @@ namespace PAppsplayer
 			}
 		}
 
+		//Here i'm closing each tab one by one and clearing up temp data left behind
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			MessageBoxResult result = MessageBox.Show("Do you really want to close " + Globals.APP_NAME + "?",
@@ -450,7 +510,7 @@ namespace PAppsplayer
 			watcher.IncludeSubdirectories = false;
 			watcher.EnableRaisingEvents = true;
 		}
-
+		//Only show required menu option in webview2
 		private void menurequested(object sender, CoreWebView2ContextMenuRequestedEventArgs args)
 		{
 
