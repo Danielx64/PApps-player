@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
 
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Web.WebView2.Core;
@@ -140,33 +139,8 @@ namespace PAppsplayer
 
 			wv.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
 
-			//create TextBlock
-			TextBlock textBlock = new TextBlock();
-
-			//add new Run to TextBlock
-			textBlock.Inlines.Add(new Run(headerText));
-
-			//add new Run to TextBlock
-			textBlock.Inlines.Add(new Run("   "));
-
-			//create Run
-			Run runHyperlink = new Run("X");
-			runHyperlink.FontFamily = new FontFamily("Monotype Corsiva");
-			runHyperlink.FontWeight = FontWeights.Bold;
-			runHyperlink.Foreground = new SolidColorBrush(Colors.Red);
-
-			//add Run to HyperLink
-			Hyperlink hyperlink = new Hyperlink(runHyperlink) { Name = $"hyperlink_{_tabCount}" };
-			hyperlink.Click += Hyperlink_Click;
-
-			//add Hyperlink to TextBlock
-			textBlock.Inlines.Add(hyperlink);
-
-			//create new instance and set Content
-			HeaderedContentControl hcc = new HeaderedContentControl() { Content = textBlock };
-
 			//add TabItem
-			_webView2Tabs.Add(new TabItem { Header = hcc, Content = wv, Name = $"tab_{_tabCount}" });
+			_webView2Tabs.Add(new TabItem {  Content = wv, Name = $"tab_{_tabCount}" });
 
 			//navigate
 			wv.Source = uri;
