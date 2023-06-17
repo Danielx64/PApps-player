@@ -14,7 +14,6 @@
         Title="MainWindow" Height="450" Width="800">
 
 	<DockPanel LastChildFill="True">
-
 		<!--The tab control with with tab tearing support.-->
 		<ct:ChromeTabControl x:Name="tabControl1"
                              MaximumTabWidth="200"
