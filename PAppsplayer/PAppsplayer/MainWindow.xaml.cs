@@ -101,8 +101,8 @@ namespace PAppsplayer
 
 		//I think I create my webview here?
 
-			var tab = new ViewModel { TabName = "Tab class 1", MyStringContent = "New webview2 content here"};
-			return tab;
+		//	var tab = new ViewModel { TabName = "Tab class 1", MyStringContent = "New webview2 content here"};
+			return new MainWindow();
 		}
 		private object MainWindow1()
 		{
