@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PAppsplayer"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:ct="clr-namespace:ChromeTabs;assembly=ChromeTabs"
         mc:Ignorable="d"
         WindowState="Maximized"
 		WindowStartupLocation="CenterScreen"
@@ -13,14 +14,24 @@
         Title="MainWindow" Height="450" Width="800">
 
 	<DockPanel LastChildFill="True">
-		<Button Click="Button_Click" 
-                DockPanel.Dock="Top"
-                Content="+"></Button>
 
-		<Grid x:Name="TabArea"
-              DockPanel.Dock="Bottom">
-
-			<TabControl x:Name="tabControl1" ItemsSource="{Binding Path= WebView2Tabs, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" SelectedIndex="{Binding Path= SelectedIndex, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" IsSynchronizedWithCurrentItem="True" />
-		</Grid>
+		<!--The tab control with with tab tearing support.-->
+		<ct:ChromeTabControl x:Name="tabControl1"
+                             MaximumTabWidth="200"
+                             TabPersistBehavior="Timed"
+                             TabPersistDuration="0:0:0:5"
+                             AddTabButtonBehavior="OpenNewTab"
+                             Background="AliceBlue"
+                             ItemsSource="{Binding Path= WebView2Tabs, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                             SelectedItem="{Binding SelectedTab}"
+                             SelectedTabBrush="WhiteSmoke"
+                             CanMoveTabs="True"
+                             DragWindowWithOneTab="True"
+                             IsAddButtonVisible="True"
+                             AddTabCommand="{Binding AddTabCommand}"
+                             CloseTabCommand="{Binding CloseTabCommand}"
+                             ReorderTabsCommand="{Binding ReorderTabsCommand}">
+			
+		</ct:ChromeTabControl>
 	</DockPanel>
 </Window>
