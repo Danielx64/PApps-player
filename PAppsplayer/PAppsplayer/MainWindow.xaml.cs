@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
@@ -42,20 +41,6 @@ namespace PAppsplayer.ViewModel
 				if (_tabName != value)
 				{
 					Set(() => TabName, ref _tabName, value);
-				}
-			}
-		}
-
-
-		private bool _isPinned;
-		public bool IsPinned
-		{
-			get => _isPinned;
-			set
-			{
-				if (_isPinned != value)
-				{
-					Set(() => IsPinned, ref _isPinned, value);
 				}
 			}
 		}
