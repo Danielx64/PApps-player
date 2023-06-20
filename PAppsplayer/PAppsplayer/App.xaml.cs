@@ -48,7 +48,8 @@ namespace PAppsplayer
 					Directory.CreateDirectory(@PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER);
 				}
 				string filePath = @PAppsplayer.MainWindow.Globals.USER_DATA_FOLDER + @"\temp.txt";
-				var outString = PAppsplayer.MainWindow.RemoveSpecialChars(Environment.GetCommandLineArgs()[1]);
+				//	var outString = PAppsplayer.MainWindow.RemoveSpecialChars(Environment.GetCommandLineArgs()[1]);
+				var outString = "";
 				using (StreamWriter outputFile = new StreamWriter(filePath))
 				{
 					outputFile.WriteLine(outString);
