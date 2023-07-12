@@ -17,7 +17,7 @@ namespace Demo
     public abstract partial class WindowBase : Window
     {
         //We use this collection to keep track of what windows we have open
-     //   protected List<DockingWindow> OpenWindows = new List<DockingWindow>();
+        protected List<DockingWindow> OpenWindows = new List<DockingWindow>();
 
         protected abstract bool TryDockWindow(Point absoluteScreenPosition, TabBase dockedWindowVM);
 
@@ -26,7 +26,39 @@ namespace Demo
 
         }
 
+        protected bool TryDragTabToWindow(Point position, TabBase draggedTab)
+        {
+            if (draggedTab.IsPinned)
+                return false;//We don't want pinned tabs to be draggable either.
 
+            DockingWindow win = OpenWindows.FirstOrDefault(x => x.DataContext == draggedTab);//check if it's already open
+
+            if (win == null)//If not, create a new one
+            {
+                win = new DockingWindow
+                {
+                    Title = draggedTab?.TabName,
+                    DataContext = draggedTab
+                };
+
+                win.Closed += win_Closed;
+                win.Loaded += win_Loaded;
+                win.LocationChanged += win_LocationChanged;
+                win.Tag = position;
+                var scale = VisualTreeHelper.GetDpi(this);
+                win.Left = position.X / scale.DpiScaleX - win.Width / 2;
+                win.Top = position.Y / scale.DpiScaleY - 10;
+                
+                win.Show();
+            }
+            else
+            {
+                Debug.WriteLine(DateTime.Now.ToShortTimeString() + " got window");
+                MoveWindow(win, position);
+            }
+            OpenWindows.Add(win);
+            return true;
+        }
 
 
 
@@ -61,7 +93,7 @@ namespace Demo
         //remove the window from the open windows collection when it is closed.
         private void win_Closed(object sender, EventArgs e)
         {
-        //    OpenWindows.Remove(sender as DockingWindow);
+            OpenWindows.Remove(sender as DockingWindow);
             Debug.WriteLine(DateTime.Now.ToShortTimeString() + " closed window");
         }
         //We use this to keep track of where the window is on the screen, so we can dock it later

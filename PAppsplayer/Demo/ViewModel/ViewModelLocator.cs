@@ -12,11 +12,9 @@
   See http://www.galasoft.ch/mvvm
 */
 
-
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel;
-
+using CommonServiceLocator;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Ioc;
 
 namespace Demo.ViewModel
 {
@@ -31,41 +29,31 @@ namespace Demo.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
-            if (DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
+            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+
+            if (ViewModelBase.IsInDesignModeStatic)
             {
                 // Create design time view services and models
-                Ioc.Default.ConfigureServices(
-                        new ServiceCollection()
-
-                          .BuildServiceProvider());
+                SimpleIoc.Default.Register<IViewModelMainWindow, SampleData.SampleViewModelMainWindow>();
             }
             else
             {
                 // Create run time view services and models
-                Ioc.Default.ConfigureServices(
-                        new ServiceCollection()
+                SimpleIoc.Default.Register<IViewModelMainWindow, ViewModelMainWindow>();
 
-                          .BuildServiceProvider());
             }
-        }
 
-        public IViewModelCustomStyleExampleWindow VieWModelCustomStyleExampleWindow
-        {
-            get
-            {
-                return Ioc.Default.GetService<IViewModelCustomStyleExampleWindow>();
-            }
         }
 
         public IViewModelMainWindow ViewModelMainWindow
         {
             get
             {
-                return Ioc.Default.GetService<IViewModelMainWindow>();
+                return ServiceLocator.Current.GetInstance<IViewModelMainWindow>();
             }
         }
 
-
+        
         public static void Cleanup()
         {
             // TODO Clear the ViewModels
